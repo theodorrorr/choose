@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VOTE – Pemilihan OSIS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Jost', sans-serif;
+      background: #050505;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+    ::selection { background: #fff; color: #585858; }
+
+    #app { width: 100%; position: relative; z-index: 1; min-height: 100vh; }
+
+    /* ── BACKGROUND: animated aurora wave + grain ─────── */
+    .bg-wavy {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(1200px 600px at 20% -10%,rgba(254, 254, 255, 0.378), transparent 60%),
+        radial-gradient(1000px 700px at 100% 110%, rgba(60, 60, 60, 0.824), transparent 60%),
+        #000000;
+    }
+    .bg-wavy svg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.35; }
+    .wave-line { stroke: rgba(255,255,255,0.12); fill: none; stroke-width: 1; animation: drift 18s ease-in-out infinite; }
+    .wave-line:nth-child(2n) { animation-duration: 22s; animation-direction: reverse; opacity: 0.7; }
+    .wave-line:nth-child(3n) { animation-duration: 26s; }
+    @keyframes drift {
+      0%, 100% { transform: translateY(0) translateX(0); }
+      50% { transform: translateY(-14px) translateX(10px); }
+    }
+    .grain {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.035; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    .glow-orb {
+      position: fixed; width: 40vw; height: 40vw; border-radius: 50%; filter: blur(90px); z-index: -1; pointer-events: none;
+      animation: floatOrb 14s ease-in-out infinite;
+    }
+    .glow-orb.a { background: rgba(239, 239, 239, 0.49); top: -10%; left: -10%; }
+    .glow-orb.b { background: rgb(1, 1, 1); bottom: -15%; right: -10%; animation-delay: -6s; }
+    @keyframes floatOrb {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(30px,-20px) scale(1.08); }
+    }
+
+    /* ── SCREEN SYSTEM ────────────────────────────────── */
+    .screen {
+      position: absolute; inset: 0; min-height: 100vh; opacity: 0;
+      pointer-events: none; transition: opacity 0.5s ease, transform 0.5s ease;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 20px;
+      transform: translateY(8px) scale(0.99);
+    }
+    .screen.active { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
+    #s-entry, #s-verify { justify-content: center; }
+    #s-entry { padding-top: 230px; padding-bottom: 100px; }
+    #s-verify { padding-top: 140px; padding-bottom: 80px; }
+    #s-voting { justify-content: flex-start; align-items: stretch; padding-top: 20px; padding-bottom: 60px; overflow-y: auto; }
+
+    /* ── HEADER VOTE ──────────────────────────────────── */
+    .header-group { text-align: center; margin-top: 0; margin-bottom: 24px; }
+    .header-group h1 {
+      font-size: 100px; font-weight: 800; line-height: 0.8; letter-spacing: -3px;
+      background: linear-gradient(180deg, #fff 0%, #fff 55%, rgba(255,255,255,0.55) 100%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .header-group p {
+      font-size: 13px; font-weight: 500; margin-top: 10px; color: rgba(255,255,255,0.55);
+      letter-spacing: 3px; text-transform: uppercase; font-family: 'Space Mono', monospace;
+    }
+    .header-group p::before, .header-group p::after { content: '— '; }
+    .header-group p::after { content: ' —'; }
+
+    /* ── GLASS CARD ───────────────────────────────────── */
+    .glass-card {
+      width: 100%; max-width: 360px;
+      background: linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+      animation: cardIn 0.6s cubic-bezier(.2,.8,.2,1);
+    }
+    @keyframes cardIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .glass-card::after {
+      content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .card-label {
+      font-size: 11px; color: rgba(255,255,255,0.45); text-align: center; margin-bottom: 20px;
+      letter-spacing: 2px; text-transform: uppercase; font-family: 'Space Mono', monospace;
+    }
+
+    /* ── PILL ELEMENTS ────────────────────────────────── */
+    .pill-input, .pill-data {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50px;
+      padding: 14px 20px;
+      margin-bottom: 12px;
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.25s ease, background 0.25s ease;
+    }
+    .pill-input:focus-within { border-color: rgba(255,255,255,0.8); background: rgba(0,0,0,0.45); }
+    .pill-input input {
+      background: transparent; border: none; outline: none; color: #fff; width: 100%; text-align: center;
+      font-family: inherit; font-size: 14px;
+    }
+    .pill-input input::placeholder { color: rgba(255,255,255,0.3); }
+    .pill-data { animation: fadeUp 0.4s ease both; }
+    .pill-data:nth-of-type(1) { animation-delay: 0.05s; }
+    .pill-data:nth-of-type(2) { animation-delay: 0.1s; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .btn-pill {
+      border-radius: 50px; padding: 7px 12px; font-weight: 600; cursor: pointer;
+      width: 100%; border: none; font-family: inherit; transition: 0.25s; font-size: 13px;
+      min-height: 34px; line-height: 1.2;
+    }
+    .btn-white { background: #fff; color: #000; }
+    .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,255,255,0.15); }
+    .btn-white:active { transform: translateY(0) scale(0.98); }
+    .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.5); color: #fff; }
+    .btn-outline:hover { background: rgba(255,255,255,0.08); border-color: #fff; }
+    .btn-pill.shake { animation: shakeErr 0.4s; }
+    @keyframes shakeErr { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+    /* ── CHECKBOX LINGKARAN ───────────────────────────── */
+    .check-container {
+      display: flex; align-items: center; gap: 12px; margin: 15px 0; cursor: pointer;
+      padding: 0 10px;
+    }
+    .circle-check {
+      width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.5); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: 0.2s;
+    }
+    .circle-check.active { background: #fff; border-color: #fff; transform: scale(1.08); }
+    .circle-check.active::after {
+      content: '✓'; color: #000; font-weight: 800; font-size: 14px;
+      animation: popCheck 0.25s ease;
+    }
+    @keyframes popCheck { from { transform: scale(0); } to { transform: scale(1); } }
+
+    /* ── FOOTER ───────────────────────────────────────── */
+    .footer { margin-top: auto; padding-top: 30px; padding-bottom: 30px; text-align: center; }
+    .footer p { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
+    .footer-logo { font-size: 22px; font-weight: 800; letter-spacing: 4px; }
+    .footer-logo .dot { display: inline-block; animation: blink 2.4s ease-in-out infinite; }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+    /* ── TOP ACTIONS ──────────────────────────────────── */
+    .top-actions { position: absolute; top: 30px; right: 30px; display: flex; gap: 10px; z-index: 5; }
+    .btn-icon {
+      width: 35px; height: 35px; background: #fff; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; border: none; font-size: 14px;
+      cursor: pointer; transition: 0.2s;
+    }
+    .btn-icon:hover { transform: rotate(20deg) scale(1.05); }
+    .chip {
+      display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 6px 12px;
+      font-size: 11px; font-family: 'Space Mono', monospace; color: rgba(255,255,255,0.7);
+    }
+    .dot-live { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80; animation: blink 1.6s ease-in-out infinite; }
+
+    /* ── VOTING GRID ──────────────────────────────────── */
+    .voting-head { text-align: center; margin: 50px 0 30px; animation: fadeUp 0.5s ease; }
+    .voting-head h2 { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+    .voting-head p { color: rgba(255,255,255,0.5); margin-top: 6px; font-size: 14px; }
+
+    .c-list {
+      display: grid; grid-template-columns: 1fr; column-gap: 20px; row-gap: 48px;
+      width: 100%; max-width: 1100px; padding: 0 20px 60px;
+    }
+    @media (min-width: 768px) { .c-list { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .c-list { grid-template-columns: repeat(3, 1fr); } }
+
+    .c-card {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,0.12);
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeUp 0.5s ease both;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    
+    .c-card:nth-child(1) { animation-delay: 0.05s; }
+    .c-card:nth-child(2) { animation-delay: 0.15s; }
+    .c-card:nth-child(3) { animation-delay: 0.25s; }
+    .c-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.3);
+      box-shadow: 0 14px 28px rgba(0,0,0,0.4);
+      z-index: 10;
+    }
+    .c-img { height: 300px; position: relative; overflow: hidden; }
+    .c-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .c-card:hover .c-img img { transform: scale(1.06); }
+    .c-img::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 55%, transparent 100%);
+    }
+    .c-info { padding: 20px; }
+
+    /* ── ACCORDION ─────────────────────────────────────── */
+    .growing { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.4s ease; opacity: 0; }
+    .growing.open { max-height: 400px; opacity: 1; padding: 15px 0; }
+
+    .hidden { display: none !important; }
+
+    /* ── MODAL ────────────────────────────────────────── */
+    #modal { transition: opacity 0.25s ease; }
+    #modal .glass-card { animation: modalIn 0.3s cubic-bezier(.2,.8,.2,1); }
+    @keyframes modalIn { from { opacity: 0; transform: scale(0.92) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+    /* ── SUCCESS CONFETTI DOTS ────────────────────────── */
+    .confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .confetti span {
+      position: absolute; top: -10px; width: 6px; height: 6px; border-radius: 50%;
+      background: #fff; opacity: 0.8; animation: fall linear infinite;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* ── SCROLLBAR ────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+
+    /* ── SPLASH ───────────────────────────────────────── */
+    #s-splash .footer-logo { font-size: 32px; animation: fadeUp 0.6s ease 0.3s both; }
+    .splash-ring {
+      width: 60px; height: 60px; border: 2px solid rgba(255,255,255,0.15);
+      border-top-color: #fff; border-radius: 50%; margin-bottom: 24px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body>
+  <div class="bg-wavy">
+    <svg viewBox="0 0 800 800" preserveAspectRatio="none">
+      <path class="wave-line" d="M0 100 C 150 150, 300 50, 450 100 C 600 150, 750 50, 900 100"/>
+      <path class="wave-line" d="M0 200 C 150 250, 300 150, 450 200 C 600 250, 750 150, 900 200"/>
+      <path class="wave-line" d="M0 300 C 150 350, 300 250, 450 300 C 600 350, 750 250, 900 300"/>
+      <path class="wave-line" d="M0 400 C 150 450, 300 350, 450 400 C 600 450, 750 350, 900 400"/>
+      <path class="wave-line" d="M0 500 C 150 550, 300 450, 450 500 C 600 550, 750 450, 900 500"/>
+      <path class="wave-line" d="M0 600 C 150 650, 300 550, 450 600 C 600 650, 750 550, 900 600"/>
+      <path class="wave-line" d="M0 700 C 150 750, 300 650, 450 700 C 600 750, 750 650, 900 700"/>
+    </svg>
+  </div>
+  <div class="glow-orb a"></div>
+  <div class="glow-orb b"></div>
+  <div class="grain"></div>
+
+  <div id="app">
+    <!-- SCREEN 1: SPLASH -->
+    <div id="s-splash" class="screen active" style="background: #050505; justify-content: center; align-items: center;">
+      <div class="splash-ring"></div>
+      <p style="font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,0.5); margin-bottom: 8px; font-family:'Space Mono',monospace;">POWERED BY</p>
+      <h1 class="footer-logo"><img src="images/choose.png" alt="Choose" style="height: 200px;"></h1>
+    </div>
+
+    <!-- SCREEN 2: ENTRY -->
+    <div id="s-entry" class="screen">
+      <div class="top-actions">
+      </div>
+
+      <div class="header-group">
+        <h1>VOTE</h1>
+        <p>your GOAT</p>
+      </div>
+
+      <div class="glass-card">
+        <p class="card-label">Identitas Pemilih</p>
+        <div class="pill-input">
+          <input id="nisn" type="text" inputmode="numeric" placeholder="Masukkan Nomor Induk Siswa" onkeydown="if(event.key==='Enter')verify()" />
+        </div>
+        <button id="btn-verify" class="btn-pill btn-white" onclick="verify()">Verifikasi Identitas</button>
+        <p style="font-size: 10px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 15px;">Pastikan Anda Mengisi Nomor Induk Siswa Dengan Benar</p>
+      </div>
+
+      <div class="footer">
+        <p>Hasil Pilihan mu Aman dan Privat</p>
+       <h1 class="footer-logo"><img src="images/choose.png" alt="Choose" style="height: 75px;"></h1>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: VERIFY -->
+    <div id="s-verify" class="screen">
+      <div class="top-actions">
+      </div>
+
+      <div class="header-group">
+        <h1>VOTE</h1>
+        <p>your GOAT</p>
+      </div>
+
+      <div class="glass-card">
+        <p class="card-label">Identitas Pemilih</p>
+        <div class="pill-data" id="v-name">Nama Siswa</div>
+        <div style="display: flex; gap: 10px;">
+          <div class="pill-data" id="v-gender">Gender</div>
+          <div class="pill-data" id="v-kelas" style="width: 140px;">Kelas</div>
+        </div>
+        <div class="pill-data" id="v-ttl">Semarang, 16 Mei 2009</div>
+
+        <div class="check-container" onclick="toggleCb()">
+          <div id="cb" class="circle-check"></div>
+          <p style="font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.4;">Saya memastikan bahwa data di atas benar dan merupakan identitas saya.</p>
+        </div>
+
+        <button id="btn-vote" class="btn-pill btn-white hidden" onclick="goVoting()" style="margin-bottom: 10px;">Mulai Voting →</button>
+        <button class="btn-pill btn-outline" onclick="restartApp()">Tidak ini bukan saya</button>
+      </div>
+
+      <div class="footer">
+        <p>Hasil Pilihan mu Aman dan Privat</p>
+        <h1 class="footer-logo"><img src="images/choose.png" alt="Choose" style="height: 75px;"></h1>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: VOTING -->
+    <div id="s-voting" class="screen" style="overflow-y: auto; align-items: stretch;">
+      <div class="top-actions">
+        <div class="chip"><span class="dot-live"></span> Live</div>
+      </div>
+      <div class="voting-head">
+        <h2>Daftar Kandidat</h2>
+        <p>Pilih yang terbaik untuk masa depan</p>
+      </div>
+      <div class="c-list" id="c-list"></div>
+    </div>
+
+    <!-- SCREEN 5: SUCCESS -->
+    <div id="s-voted" class="screen" style="justify-content: center; text-align: center; position: relative;">
+      <div class="confetti" id="confetti"></div>
+      <div style="background: #fff; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; animation: cardIn 0.5s cubic-bezier(.2,.8,.2,1);">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="4"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <h2 style="font-size: 36px; font-weight: 800; animation: fadeUp 0.5s ease 0.1s both;">Berhasil</h2>
+      <p style="color: rgba(255,255,255,0.6); margin-bottom: 40px; animation: fadeUp 0.5s ease 0.2s both;" id="voted-desc">Pilihan Anda telah tercatat secara anonim.</p>
+      <button class="btn-pill btn-white" onclick="restartApp()" style="max-width: 250px; animation: fadeUp 0.5s ease 0.3s both;">Selesai & Keluar</button>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px;">
+    <div class="glass-card" style="text-align: center;">
+      <h3 style="font-size: 20px; margin-bottom: 15px;">Konfirmasi Pilihan</h3>
+      <p id="m-desc" style="font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 25px;"></p>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-pill btn-outline" onclick="closeModal()">Pilih Kembali</button>
+        <button class="btn-pill btn-white" onclick="confirmVote()">Ya, saya yakin dengan pilihan saya</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // NOTE: seluruh nama, NISN, dan data siswa/kandidat di bawah ini hanyalah data karangan / contoh.
+    const SISWA = {
+      "1": { name: "Genesis Theodore Putra Wardana", kelas: "XII - 5 / 11", gender: "Laki Laki", ttl: "Semarang, 16 Mei 2009" },
+      "2": { name: "Alya Ramadhani Saputri", kelas: "XI - 2 / 04", gender: "Perempuan", ttl: "Yogyakarta, 3 Agustus 2008" }
+    };
+
+    const KANDIDAT = [
+      { id: 1, no: 1, nama: "March 7th", kelas: "XII IPA 3", visi: "Pacarin teo klo jadi ketos", misi: "Pacarin teo klo jadi ketos", foto: "images/3.png" },
+      { id: 2, no: 2, nama: "Jirou", kelas: "SMK Tadika Mesra Mesraan", visi: "ngebagusin band.", misi: "semua orang kudu bisa main alat musik", foto: "images/4.png" },
+      { id: 3, no: 3, nama: "Arthura Morgani", kelas: "XII IPS 5", visi: "take a gamble that loves exist, and do a loving act", misi: "Jangan ngancem petani yg batuk batuk biar ga tbc", foto: "images/5.png" }
+    ];
+    let selectedId = null;
+    let isChecked = false;
+
+    function show(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function verify() {
+      const nisn = document.getElementById('nisn').value.trim();
+      const data = SISWA[nisn];
+      if (data) {
+        document.getElementById('v-name').textContent = data.name;
+        document.getElementById('v-kelas').textContent = data.kelas;
+        document.getElementById('v-gender').textContent = data.gender;
+        document.getElementById('v-ttl').textContent = data.ttl;
+        show('s-verify');
+      } else {
+        const btn = document.getElementById('btn-verify');
+        btn.classList.add('shake');
+        setTimeout(() => btn.classList.remove('shake'), 400);
+        alert("Nomor Induk Siswa tidak ditemukan. Pastikan Anda memasukkan NISN yang benar.");
+      }
+    }
+
+    function toggleCb() {
+      isChecked = !isChecked;
+      document.getElementById('cb').classList.toggle('active', isChecked);
+      document.getElementById('btn-vote').classList.toggle('hidden', !isChecked);
+    }
+
+    function restartApp() {
+      isChecked = false;
+      document.getElementById('nisn').value = "";
+      document.getElementById('cb').classList.remove('active');
+      document.getElementById('btn-vote').classList.add('hidden');
+      show('s-entry');
+    }
+
+    function toggleGrowing(id) {
+      const content = document.getElementById(`grow-${id}`);
+      const btn = document.getElementById(`btn-grow-${id}`);
+      if (content.classList.contains('open')) {
+        content.classList.remove('open');
+        btn.textContent = "Lihat Visi & Misi";
+      } else {
+        content.classList.add('open');
+        btn.textContent = "Tutup Visi & Misi";
+      }
+    }
+
+    function goVoting() {
+      const list = document.getElementById('c-list');
+      list.innerHTML = KANDIDAT.map(c => `
+        <div class="c-card">
+          <div class="c-img">
+            <img src="${c.foto}" alt="${c.nama}">
+            <div style="position:absolute; bottom:20px; left:20px; z-index:2;">
+              <h3 style="font-size:24px; font-weight:800;">${c.nama}</h3>
+              <p style="font-size:12px; font-weight:400; opacity:0.6;">${c.kelas}</p>
+            </div>
+            <div style="position:absolute; top:20px; left:20px; background:#fff; color:#000; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; z-index:2;">${c.no}</div>
+          </div>
+          <div class="c-info">
+            <button class="btn-pill btn-outline" id="btn-grow-${c.id}" onclick="toggleGrowing(${c.id})" style="margin-bottom:10px;">Lihat Visi & Misi</button>
+            <div id="grow-${c.id}" class="growing">
+              <p style="font-size:11px; opacity:0.5; text-transform:uppercase; font-family:'Space Mono',monospace;">Visi</p>
+              <p style="font-size:14px; margin-bottom:15px;">"${c.visi}"</p>
+              <p style="font-size:11px; opacity:0.5; text-transform:uppercase; font-family:'Space Mono',monospace;">Misi</p>
+              <p style="font-size:14px;">${c.misi}</p>
+            </div>
+            <button class="btn-pill btn-white" onclick="openModal(${c.id})">Pilih Kandidat ${c.no}</button>
+          </div>
+        </div>
+      `).join('');
+      show('s-voting');
+    }
+
+    function openModal(id) {
+      selectedId = id;
+      const c = KANDIDAT.find(x => x.id === id);
+      document.getElementById('m-desc').textContent = `Anda yakin ingin memilih ${c.nama}?`;
+      document.getElementById('modal').style.display = 'flex';
+    }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+    function confirmVote() {
+      closeModal();
+      const c = KANDIDAT.find(x => x.id === selectedId);
+      document.getElementById('voted-desc').textContent = `Suara untuk ${c ? c.nama : 'kandidat'} telah tercatat secara anonim.`;
+      spawnConfetti();
+      show('s-voted');
+    }
+
+    function spawnConfetti() {
+      const holder = document.getElementById('confetti');
+      holder.innerHTML = '';
+      const colors = ['#fff', 'rgba(255,255,255,0.6)', 'rgba(200,200,255,0.8)'];
+      for (let i = 0; i < 40; i++) {
+        const s = document.createElement('span');
+        s.style.left = Math.random() * 100 + '%';
+        s.style.background = colors[Math.floor(Math.random() * colors.length)];
+        s.style.animationDuration = (2 + Math.random() * 2) + 's';
+        s.style.animationDelay = (Math.random() * 0.5) + 's';
+        s.style.opacity = 0.5 + Math.random() * 0.5;
+        holder.appendChild(s);
+      }
+    }
+
+    // Jalankan Splash
+    setTimeout(() => { show('s-entry'); }, 2200);
+  </script>
+</body>
+</html>
