@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>VOTE – Pemilihan OSIS</title>
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-
+ 
   
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -20,9 +23,9 @@
       overflow-x: hidden;
     }
     ::selection { background: #fff; color: #585858; }
-
+ 
     #app { width: 100%; position: relative; z-index: 1; min-height: 100vh; }
-
+ 
     /* ── BACKGROUND: animated aurora wave + grain ─────── */
     .bg-wavy {
       position: fixed;
@@ -55,7 +58,7 @@
       0%, 100% { transform: translate(0,0) scale(1); }
       50% { transform: translate(30px,-20px) scale(1.08); }
     }
-
+ 
     /* ── SCREEN SYSTEM ────────────────────────────────── */
     .screen {
       position: absolute; inset: 0; min-height: 100vh; opacity: 0;
@@ -63,13 +66,15 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       padding: 20px;
       transform: translateY(8px) scale(0.99);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .screen.active { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
     #s-entry, #s-verify { justify-content: center; }
     #s-entry { padding-top: 230px; padding-bottom: 100px; }
     #s-verify { padding-top: 140px; padding-bottom: 80px; }
     #s-voting { justify-content: flex-start; align-items: stretch; padding-top: 20px; padding-bottom: 60px; overflow-y: auto; }
-
+ 
     /* ── HEADER VOTE ──────────────────────────────────── */
     .header-group { text-align: center; margin-top: 0; margin-bottom: 24px; }
     .header-group h1 {
@@ -83,7 +88,7 @@
     }
     .header-group p::before, .header-group p::after { content: '— '; }
     .header-group p::after { content: ' —'; }
-
+ 
     /* ── GLASS CARD ───────────────────────────────────── */
     .glass-card {
       width: 100%; max-width: 360px;
@@ -108,7 +113,7 @@
       font-size: 11px; color: rgba(255,255,255,0.45); text-align: center; margin-bottom: 20px;
       letter-spacing: 2px; text-transform: uppercase; font-family: 'Space Mono', monospace;
     }
-
+ 
     /* ── PILL ELEMENTS ────────────────────────────────── */
     .pill-input, .pill-data {
       background: rgba(0, 0, 0, 0.3);
@@ -132,7 +137,7 @@
     .pill-data:nth-of-type(1) { animation-delay: 0.05s; }
     .pill-data:nth-of-type(2) { animation-delay: 0.1s; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
+ 
     .btn-pill {
       border-radius: 50px; padding: 7px 12px; font-weight: 600; cursor: pointer;
       width: 100%; border: none; font-family: inherit; transition: 0.25s; font-size: 13px;
@@ -145,7 +150,7 @@
     .btn-outline:hover { background: rgba(255,255,255,0.08); border-color: #fff; }
     .btn-pill.shake { animation: shakeErr 0.4s; }
     @keyframes shakeErr { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
-
+ 
     /* ── CHECKBOX LINGKARAN ───────────────────────────── */
     .check-container {
       display: flex; align-items: center; gap: 12px; margin: 15px 0; cursor: pointer;
@@ -162,14 +167,14 @@
       animation: popCheck 0.25s ease;
     }
     @keyframes popCheck { from { transform: scale(0); } to { transform: scale(1); } }
-
+ 
     /* ── FOOTER ───────────────────────────────────────── */
     .footer { margin-top: auto; padding-top: 30px; padding-bottom: 30px; text-align: center; }
     .footer p { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
     .footer-logo { font-size: 22px; font-weight: 800; letter-spacing: 4px; }
     .footer-logo .dot { display: inline-block; animation: blink 2.4s ease-in-out infinite; }
     @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
-
+ 
     /* ── TOP ACTIONS ──────────────────────────────────── */
     .top-actions { position: absolute; top: 30px; right: 30px; display: flex; gap: 10px; z-index: 5; }
     .btn-icon {
@@ -184,19 +189,19 @@
       font-size: 11px; font-family: 'Space Mono', monospace; color: rgba(255,255,255,0.7);
     }
     .dot-live { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80; animation: blink 1.6s ease-in-out infinite; }
-
+ 
     /* ── VOTING GRID ──────────────────────────────────── */
     .voting-head { text-align: center; margin: 50px 0 30px; animation: fadeUp 0.5s ease; }
     .voting-head h2 { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
     .voting-head p { color: rgba(255,255,255,0.5); margin-top: 6px; font-size: 14px; }
-
+ 
     .c-list {
       display: grid; grid-template-columns: 1fr; column-gap: 20px; row-gap: 48px;
       width: 100%; max-width: 1100px; padding: 0 20px 60px;
     }
     @media (min-width: 768px) { .c-list { grid-template-columns: repeat(2, 1fr); } }
     @media (min-width: 1024px) { .c-list { grid-template-columns: repeat(3, 1fr); } }
-
+ 
     .c-card {
       position: relative;
       z-index: 1;
@@ -224,18 +229,18 @@
       background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 55%, transparent 100%);
     }
     .c-info { padding: 20px; }
-
+ 
     /* ── ACCORDION ─────────────────────────────────────── */
     .growing { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.4s ease; opacity: 0; }
     .growing.open { max-height: 400px; opacity: 1; padding: 15px 0; }
-
+ 
     .hidden { display: none !important; }
-
+ 
     /* ── MODAL ────────────────────────────────────────── */
     #modal { transition: opacity 0.25s ease; }
     #modal .glass-card { animation: modalIn 0.3s cubic-bezier(.2,.8,.2,1); }
     @keyframes modalIn { from { opacity: 0; transform: scale(0.92) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-
+ 
     /* ── SUCCESS CONFETTI DOTS ────────────────────────── */
     .confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
     .confetti span {
@@ -245,11 +250,11 @@
     @keyframes fall {
       to { transform: translateY(110vh) rotate(360deg); opacity: 0; }
     }
-
+ 
     /* ── SCROLLBAR ────────────────────────────────────── */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
-
+ 
     /* ── SPLASH ───────────────────────────────────────── */
     #s-splash .footer-logo { font-size: 32px; animation: fadeUp 0.6s ease 0.3s both; }
     .splash-ring {
@@ -260,7 +265,7 @@
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
-
+ 
 <body>
   <div class="bg-wavy">
     <svg viewBox="0 0 800 800" preserveAspectRatio="none">
@@ -276,7 +281,7 @@
   <div class="glow-orb a"></div>
   <div class="glow-orb b"></div>
   <div class="grain"></div>
-
+ 
   <div id="app">
     <!-- SCREEN 1: SPLASH -->
     <div id="s-splash" class="screen active" style="background: #050505; justify-content: center; align-items: center;">
@@ -284,17 +289,17 @@
       <p style="font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,0.5); margin-bottom: 8px; font-family:'Space Mono',monospace;">POWERED BY</p>
       <h1 class="footer-logo"><img src="images/choose.png" alt="Choose" style="height: 200px;"></h1>
     </div>
-
+ 
     <!-- SCREEN 2: ENTRY -->
     <div id="s-entry" class="screen">
       <div class="top-actions">
       </div>
-
+ 
       <div class="header-group">
         <h1>VOTE</h1>
         <p>your GOAT</p>
       </div>
-
+ 
       <div class="glass-card">
         <p class="card-label">Identitas Pemilih</p>
         <div class="pill-input">
@@ -303,23 +308,23 @@
         <button id="btn-verify" class="btn-pill btn-white" onclick="verify()">Verifikasi Identitas</button>
         <p style="font-size: 10px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 15px;">Pastikan Anda Mengisi Nomor Induk Siswa Dengan Benar</p>
       </div>
-
+ 
       <div class="footer">
         <p>Hasil Pilihan mu Aman dan Privat</p>
        <h1 class="footer-logo"><img src="images/choose.png" alt="Choose" style="height: 75px;"></h1>
       </div>
     </div>
-
+ 
     <!-- SCREEN 3: VERIFY -->
     <div id="s-verify" class="screen">
       <div class="top-actions">
       </div>
-
+ 
       <div class="header-group">
         <h1>VOTE</h1>
         <p>your GOAT</p>
       </div>
-
+ 
       <div class="glass-card">
         <p class="card-label">Identitas Pemilih</p>
         <div class="pill-data" id="v-name">Nama Siswa</div>
@@ -328,22 +333,22 @@
           <div class="pill-data" id="v-kelas" style="width: 140px;">Kelas</div>
         </div>
         <div class="pill-data" id="v-ttl">Semarang, 16 Mei 2009</div>
-
+ 
         <div class="check-container" onclick="toggleCb()">
           <div id="cb" class="circle-check"></div>
           <p style="font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.4;">Saya memastikan bahwa data di atas benar dan merupakan identitas saya.</p>
         </div>
-
-        <button id="btn-vote" class="btn-pill btn-white hidden" onclick="goVoting()" style="margin-bottom: 10px;">Mulai Voting →</button>
+ 
+        <button id="btn-vote" class="btn-pill btn-white hidden" onclick="goVoting()" style="margin-bottom: 10px; display:none;">Mulai Voting →</button>
         <button class="btn-pill btn-outline" onclick="restartApp()">Tidak ini bukan saya</button>
       </div>
-
+ 
       <div class="footer">
         <p>Hasil Pilihan mu Aman dan Privat</p>
         <h1 class="footer-logo"><img src="images/choose.png" alt="Choose" style="height: 75px;"></h1>
       </div>
     </div>
-
+ 
     <!-- SCREEN 4: VOTING -->
     <div id="s-voting" class="screen" style="overflow-y: auto; align-items: stretch;">
       <div class="top-actions">
@@ -355,7 +360,7 @@
       </div>
       <div class="c-list" id="c-list"></div>
     </div>
-
+ 
     <!-- SCREEN 5: SUCCESS -->
     <div id="s-voted" class="screen" style="justify-content: center; text-align: center; position: relative;">
       <div class="confetti" id="confetti"></div>
@@ -367,7 +372,7 @@
       <button class="btn-pill btn-white" onclick="restartApp()" style="max-width: 250px; animation: fadeUp 0.5s ease 0.3s both;">Selesai & Keluar</button>
     </div>
   </div>
-
+ 
   <!-- MODAL -->
   <div id="modal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px;">
     <div class="glass-card" style="text-align: center;">
@@ -379,27 +384,28 @@
       </div>
     </div>
   </div>
-
+ 
   <script>
     // NOTE: seluruh nama, NISN, dan data siswa/kandidat di bawah ini hanyalah data karangan / contoh.
     const SISWA = {
       "1": { name: "Genesis Theodore Putra Wardana", kelas: "XII - 5 / 11", gender: "Laki Laki", ttl: "Semarang, 16 Mei 2009" },
       "2": { name: "Alya Ramadhani Saputri", kelas: "XI - 2 / 04", gender: "Perempuan", ttl: "Yogyakarta, 3 Agustus 2008" }
     };
-
+ 
     const KANDIDAT = [
-      { id: 1, no: 1, nama: "March 7th", kelas: "XII IPA 3", visi: "Pacarin teo klo jadi ketos", misi: "Pacarin teo klo jadi ketos", foto: "images/3.png" },
-      { id: 2, no: 2, nama: "Jirou", kelas: "SMK Tadika Mesra Mesraan", visi: "ngebagusin band.", misi: "semua orang kudu bisa main alat musik", foto: "images/4.png" },
-      { id: 3, no: 3, nama: "Arthura Morgani", kelas: "XII IPS 5", visi: "take a gamble that loves exist, and do a loving act", misi: "Jangan ngancem petani yg batuk batuk biar ga tbc", foto: "images/5.png" }
+      { id: 1, no: 1, nama: "Rizky Maulana", kelas: "XII IPA 3", visi: "Membangun harmoni siswa.", misi: "Menyelenggarakan event kolaboratif antar kelas setiap bulan.", foto: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400" },
+      { id: 2, no: 2, nama: "Aulia Nurfadilah", kelas: "XII IPS 1", visi: "Digitalisasi OSIS.", misi: "Membangun sistem informasi sekolah yang transparan dan mudah diakses.", foto: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400" },
+      { id: 3, no: 3, nama: "Dimas Arya", kelas: "XI IPA 2", visi: "Sportivitas tinggi.", misi: "Memperbanyak kompetisi olahraga antar angkatan.", foto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" }
     ];
+ 
     let selectedId = null;
     let isChecked = false;
-
+ 
     function show(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
     }
-
+ 
     function verify() {
       const nisn = document.getElementById('nisn').value.trim();
       const data = SISWA[nisn];
@@ -416,21 +422,27 @@
         alert("Nomor Induk Siswa tidak ditemukan. Pastikan Anda memasukkan NISN yang benar.");
       }
     }
-
+ 
     function toggleCb() {
       isChecked = !isChecked;
-      document.getElementById('cb').classList.toggle('active', isChecked);
-      document.getElementById('btn-vote').classList.toggle('hidden', !isChecked);
+      const cb = document.getElementById('cb');
+      const btnVote = document.getElementById('btn-vote');
+      cb.classList.toggle('active', isChecked);
+      btnVote.classList.toggle('hidden', !isChecked);
+      // Inline style as a failsafe in case any cached/old CSS lingers
+      btnVote.style.display = isChecked ? 'block' : 'none';
     }
-
+ 
     function restartApp() {
       isChecked = false;
       document.getElementById('nisn').value = "";
       document.getElementById('cb').classList.remove('active');
-      document.getElementById('btn-vote').classList.add('hidden');
+      const btnVote = document.getElementById('btn-vote');
+      btnVote.classList.add('hidden');
+      btnVote.style.display = 'none';
       show('s-entry');
     }
-
+ 
     function toggleGrowing(id) {
       const content = document.getElementById(`grow-${id}`);
       const btn = document.getElementById(`btn-grow-${id}`);
@@ -442,7 +454,7 @@
         btn.textContent = "Tutup Visi & Misi";
       }
     }
-
+ 
     function goVoting() {
       const list = document.getElementById('c-list');
       list.innerHTML = KANDIDAT.map(c => `
@@ -469,7 +481,7 @@
       `).join('');
       show('s-voting');
     }
-
+ 
     function openModal(id) {
       selectedId = id;
       const c = KANDIDAT.find(x => x.id === id);
@@ -477,7 +489,7 @@
       document.getElementById('modal').style.display = 'flex';
     }
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
-
+ 
     function confirmVote() {
       closeModal();
       const c = KANDIDAT.find(x => x.id === selectedId);
@@ -485,7 +497,7 @@
       spawnConfetti();
       show('s-voted');
     }
-
+ 
     function spawnConfetti() {
       const holder = document.getElementById('confetti');
       holder.innerHTML = '';
@@ -500,7 +512,7 @@
         holder.appendChild(s);
       }
     }
-
+ 
     // Jalankan Splash
     setTimeout(() => { show('s-entry'); }, 2200);
   </script>
