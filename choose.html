@@ -9,22 +9,31 @@
   <title>VOTE – Pemilihan OSIS</title>
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
  
-  
   <style>
+    :root {
+      --font-title: clamp(3.5rem, 12vw, 6.25rem);
+      --font-subtitle: clamp(0.75rem, 1.5vw, 0.8125rem);
+      --font-body: clamp(0.875rem, 1.1vw, 1rem);
+      --font-button: clamp(0.8125rem, 1.2vw, 1rem);
+      --font-card-label: clamp(0.625rem, 1vw, 0.6875rem);
+      --card-width: min(92vw, 380px);
+    }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html { scroll-behavior: smooth; }
     body {
       font-family: 'Jost', sans-serif;
       background: #050505;
       color: #fff;
-      min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       justify-content: center;
       overflow-x: hidden;
+      font-size: var(--font-body);
     }
     ::selection { background: #fff; color: #585858; }
  
-    #app { width: 100%; position: relative; z-index: 1; min-height: 100vh; }
+    #app { width: 100%; position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; }
  
     /* ── BACKGROUND: animated aurora wave + grain ─────── */
     .bg-wavy {
@@ -49,7 +58,7 @@
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
     .glow-orb {
-      position: fixed; width: 40vw; height: 40vw; border-radius: 50%; filter: blur(90px); z-index: -1; pointer-events: none;
+      position: fixed; width: clamp(250px, 40vw, 600px); height: clamp(250px, 40vw, 600px); border-radius: 50%; filter: blur(90px); z-index: -1; pointer-events: none;
       animation: floatOrb 14s ease-in-out infinite;
     }
     .glow-orb.a { background: rgba(239, 239, 239, 0.49); top: -10%; left: -10%; }
@@ -61,29 +70,27 @@
  
     /* ── SCREEN SYSTEM ────────────────────────────────── */
     .screen {
-      position: absolute; inset: 0; min-height: 100vh; opacity: 0;
+      position: absolute; inset: 0; min-height: 100dvh; opacity: 0;
       pointer-events: none; transition: opacity 0.5s ease, transform 0.5s ease;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 20px;
-      transform: translateY(8px) scale(0.99);
+      padding: clamp(1rem, 3vw, 2rem);
+      transform: translateY(8px);
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
-    .screen.active { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
-    #s-entry, #s-verify { justify-content: center; }
-    #s-entry { padding-top: 230px; padding-bottom: 100px; }
-    #s-verify { padding-top: 115px; padding-bottom: 1px; }
-    #s-voting { justify-content: flex-start; align-items: stretch; padding-top: 20px; padding-bottom: 60px; overflow-y: auto; }
+    .screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+    #s-entry, #s-verify { justify-content: space-between; padding-top: clamp(1rem, 5vh, 3rem); padding-bottom: clamp(1rem, 3vh, 2rem); }
+    #s-voting { justify-content: flex-start; align-items: stretch; padding-top: clamp(3.5rem, 8vh, 5rem); padding-bottom: clamp(2rem, 5vh, 4rem); overflow-y: auto; }
  
     /* ── HEADER VOTE ──────────────────────────────────── */
-    .header-group { text-align: center; margin-top: 0; margin-bottom: 24px; }
+    .header-group { text-align: center; margin-top: clamp(0.5rem, 2vh, 1.5rem); margin-bottom: clamp(1rem, 3vh, 2rem); width: 100%; }
     .header-group h1 {
-      font-size: 100px; font-weight: 800; line-height: 0.8; letter-spacing: -3px;
+      font-size: var(--font-title); font-weight: 800; line-height: 0.85; letter-spacing: -3px;
       background: linear-gradient(180deg, #fff 0%, #fff 55%, rgba(255,255,255,0.55) 100%);
       -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
     }
     .header-group p {
-      font-size: 13px; font-weight: 500; margin-top: 10px; color: rgba(255,255,255,0.55);
+      font-size: var(--font-subtitle); font-weight: 500; margin-top: clamp(0.375rem, 1vh, 0.625rem); color: rgba(255,255,255,0.55);
       letter-spacing: 3px; text-transform: uppercase; font-family: 'Space Mono', monospace;
     }
     .header-group p::before, .header-group p::after { content: '— '; }
@@ -91,17 +98,17 @@
  
     /* ── GLASS CARD ───────────────────────────────────── */
     .glass-card {
-      width: 100%; max-width: 360px;
+      width: var(--card-width);
       background: linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 24px;
-      padding: 30px;
+      border-radius: clamp(16px, 4vw, 24px);
+      padding: clamp(1.25rem, 4vw, 2rem);
       position: relative;
-      overflow: hidden;
       box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
       animation: cardIn 0.6s cubic-bezier(.2,.8,.2,1);
+      margin: 0 auto;
     }
     @keyframes cardIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     .glass-card::after {
@@ -110,7 +117,7 @@
       pointer-events: none;
     }
     .card-label {
-      font-size: 11px; color: rgba(255,255,255,0.45); text-align: center; margin-bottom: 20px;
+      font-size: var(--font-card-label); color: rgba(255,255,255,0.45); text-align: center; margin-bottom: clamp(0.875rem, 2vh, 1.25rem);
       letter-spacing: 2px; text-transform: uppercase; font-family: 'Space Mono', monospace;
     }
  
@@ -119,29 +126,30 @@
       background: rgba(0, 0, 0, 0.3);
       border: 1px solid rgba(255, 255, 255, 0.4);
       border-radius: 50px;
-      padding: 14px 20px;
-      margin-bottom: 12px;
+      padding: clamp(0.625rem, 2vh, 0.875rem) clamp(0.875rem, 3vw, 1.25rem);
+      margin-bottom: clamp(0.5rem, 1.5vh, 0.75rem);
       width: 100%;
       text-align: center;
-      font-size: 14px;
+      font-size: var(--font-body);
       display: flex; align-items: center; justify-content: center;
       transition: border-color 0.25s ease, background 0.25s ease;
+      min-height: 44px;
     }
     .pill-input:focus-within { border-color: rgba(255,255,255,0.8); background: rgba(0,0,0,0.45); }
     .pill-input input {
       background: transparent; border: none; outline: none; color: #fff; width: 100%; text-align: center;
-      font-family: inherit; font-size: 14px;
+      font-family: inherit; font-size: var(--font-body);
     }
     .pill-input input::placeholder { color: rgba(255,255,255,0.3); }
-    .pill-data { animation: fadeUp 0.4s ease both; }
+    .pill-data { animation: fadeUp 0.4s ease both; word-break: break-word; }
     .pill-data:nth-of-type(1) { animation-delay: 0.05s; }
     .pill-data:nth-of-type(2) { animation-delay: 0.1s; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
  
     .btn-pill {
-      border-radius: 50px; padding: 7px 12px; font-weight: 600; cursor: pointer;
-      width: 100%; border: none; font-family: inherit; transition: 0.25s; font-size: 13px;
-      min-height: 34px; line-height: 1.2;
+      border-radius: 50px; padding: clamp(0.5rem, 1.5vh, 0.75rem) clamp(0.75rem, 2vw, 1rem); font-weight: 600; cursor: pointer;
+      width: 100%; border: none; font-family: inherit; transition: 0.25s; font-size: var(--font-button);
+      min-height: 44px; line-height: 1.2; display: inline-flex; align-items: center; justify-content: center;
     }
     .btn-white { background: #fff; color: #000; }
     .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,255,255,0.15); }
@@ -153,8 +161,8 @@
  
     /* ── CHECKBOX LINGKARAN ───────────────────────────── */
     .check-container {
-      display: flex; align-items: center; gap: 12px; margin: 15px 0; cursor: pointer;
-      padding: 0 10px;
+      display: flex; align-items: center; gap: clamp(0.5rem, 2vw, 0.75rem); margin: clamp(0.625rem, 2vh, 1rem) 0; cursor: pointer;
+      padding: 0 clamp(0.25rem, 1vw, 0.625rem);
     }
     .circle-check {
       width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.5); border-radius: 50%;
@@ -169,47 +177,53 @@
     @keyframes popCheck { from { transform: scale(0); } to { transform: scale(1); } }
  
     /* ── FOOTER ───────────────────────────────────────── */
-    .footer { margin-top: auto; padding-top: 30px; padding-bottom: 30px; text-align: center; }
-    .footer p { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
-    .footer-logo { font-size: 22px; font-weight: 800; letter-spacing: 4px; }
+    .footer { margin-top: auto; padding-top: clamp(1rem, 3vh, 2rem); padding-bottom: clamp(1rem, 2vh, 1.5rem); text-align: center; width: 100%; }
+    .footer p { font-size: var(--font-card-label); color: rgba(255,255,255,0.4); margin-bottom: 0.625rem; }
+    .footer-logo { font-size: clamp(1.25rem, 3vw, 1.375rem); font-weight: 800; letter-spacing: 4px; display: flex; justify-content: center; align-items: center; }
+    .footer-logo img { height: clamp(40px, 8vh, 75px); width: auto; max-width: 80vw; object-fit: contain; }
     .footer-logo .dot { display: inline-block; animation: blink 2.4s ease-in-out infinite; }
     @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
  
     /* ── TOP ACTIONS ──────────────────────────────────── */
-    .top-actions { position: absolute; top: 30px; right: 30px; display: flex; gap: 10px; z-index: 5; }
+    .top-actions { position: absolute; top: clamp(0.75rem, 3vh, 1.875rem); right: clamp(0.75rem, 3vw, 1.875rem); display: flex; gap: 10px; z-index: 5; }
     .btn-icon {
       width: 35px; height: 35px; background: #fff; border-radius: 50%;
       display: flex; align-items: center; justify-content: center; border: none; font-size: 14px;
-      cursor: pointer; transition: 0.2s;
+      cursor: pointer; transition: 0.2s; min-height: 35px;
     }
     .btn-icon:hover { transform: rotate(20deg) scale(1.05); }
     .chip {
       display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 6px 12px;
-      font-size: 11px; font-family: 'Space Mono', monospace; color: rgba(255,255,255,0.7);
+      font-size: clamp(0.625rem, 1vw, 0.6875rem); font-family: 'Space Mono', monospace; color: rgba(255,255,255,0.7);
     }
-    .dot-live { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80; animation: blink 1.6s ease-in-out infinite; }
+   
  
     /* ── VOTING GRID ──────────────────────────────────── */
-    .voting-head { text-align: center; margin: 50px 0 30px; animation: fadeUp 0.5s ease; }
-    .voting-head h2 { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
-    .voting-head p { color: rgba(255,255,255,0.5); margin-top: 6px; font-size: 14px; }
+    .voting-head { text-align: center; margin: clamp(1.5rem, 4vh, 3.125rem) 0 clamp(1rem, 3vh, 1.875rem); animation: fadeUp 0.5s ease; width: 100%; }
+    .voting-head h2 { font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 800; letter-spacing: -1px; }
+    .voting-head p { color: rgba(255,255,255,0.5); margin-top: 6px; font-size: var(--font-body); }
  
     .c-list {
-      display: grid; grid-template-columns: 1fr; column-gap: 20px; row-gap: 48px;
-      width: 100%; max-width: 1100px; padding: 0 20px 60px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+      gap: clamp(1.25rem, 3vw, 2.5rem);
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 clamp(0.5rem, 3vw, 1.25rem) clamp(2rem, 5vh, 3.75rem);
     }
-    @media (min-width: 768px) { .c-list { grid-template-columns: repeat(2, 1fr); } }
-    @media (min-width: 1024px) { .c-list { grid-template-columns: repeat(3, 1fr); } }
  
     .c-card {
       position: relative;
       z-index: 1;
       background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-      border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,0.12);
+      border-radius: clamp(16px, 3vw, 24px); overflow: hidden; border: 1px solid rgba(255,255,255,0.12);
       transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
       animation: fadeUp 0.5s ease both;
       box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      display: flex;
+      flex-direction: column;
     }
     
     .c-card:nth-child(1) { animation-delay: 0.05s; }
@@ -221,14 +235,15 @@
       box-shadow: 0 14px 28px rgba(0,0,0,0.4);
       z-index: 10;
     }
-    .c-img { height: 300px; position: relative; overflow: hidden; }
-    .c-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .c-img { width: 100%; aspect-ratio: 4 / 3; position: relative; overflow: hidden; }
+    .c-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block; }
     .c-card:hover .c-img img { transform: scale(1.06); }
     .c-img::before {
       content: ''; position: absolute; inset: 0;
       background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 55%, transparent 100%);
+      z-index: 1;
     }
-    .c-info { padding: 20px; }
+    .c-info { padding: clamp(1rem, 3vw, 1.25rem); display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
  
     /* ── ACCORDION ─────────────────────────────────────── */
     .growing { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.4s ease; opacity: 0; }
@@ -256,13 +271,22 @@
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
  
     /* ── SPLASH ───────────────────────────────────────── */
-    #s-splash .footer-logo { font-size: 32px; animation: fadeUp 0.6s ease 0.3s both; }
+    #s-splash .footer-logo { font-size: clamp(1.5rem, 4vw, 2rem); animation: fadeUp 0.6s ease 0.3s both; }
+    #s-splash .footer-logo img { height: clamp(100px, 25vh, 200px); }
     .splash-ring {
-      width: 60px; height: 60px; border: 2px solid rgba(255,255,255,0.15);
+      width: clamp(44px, 10vw, 60px); height: clamp(44px, 10vw, 60px); border: 2px solid rgba(255,255,255,0.15);
       border-top-color: #fff; border-radius: 50%; margin-bottom: 24px;
       animation: spin 1s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── RESPONSIVE GRID HELPERS ───────────────────────── */
+    .grid-duo {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 110px), 1fr));
+      gap: 10px;
+      width: 100%;
+    }
   </style>
 </head>
  
@@ -286,8 +310,8 @@
     <!-- SCREEN 1: SPLASH -->
     <div id="s-splash" class="screen active" style="background: #050505; justify-content: center; align-items: center;">
       <div class="splash-ring"></div>
-      <p style="font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,0.5); margin-bottom: 8px; font-family:'Space Mono',monospace;">POWERED BY</p>
-      <h1 class="footer-logo"><img src="images/choose.png" alt="Choose" style="height: 200px;"></h1>
+      <p style="font-size: clamp(0.6875rem, 1.2vw, 0.75rem); letter-spacing: 2px; color: rgba(255,255,255,0.5); margin-bottom: 8px; font-family:'Space Mono',monospace;">POWERED BY</p>
+      <h1 class="footer-logo"><img src="images/choose.png" alt="Choose"></h1>
     </div>
  
     <!-- SCREEN 2: ENTRY -->
@@ -306,12 +330,12 @@
           <input id="nisn" type="text" inputmode="numeric" placeholder="Masukkan Nomor Induk Siswa" onkeydown="if(event.key==='Enter')verify()" />
         </div>
         <button id="btn-verify" class="btn-pill btn-white" onclick="verify()">Verifikasi Identitas</button>
-        <p style="font-size: 10px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 15px;">Pastikan Anda Mengisi Nomor Induk Siswa Dengan Benar</p>
+        <p style="font-size: clamp(0.625rem, 1vw, 0.6875rem); color: rgba(255,255,255,0.4); text-align: center; margin-top: 15px;">Pastikan Anda Mengisi Nomor Induk Siswa Dengan Benar</p>
       </div>
  
       <div class="footer">
         <p>Hasil Pilihan mu Aman dan Privat</p>
-       <h1 class="footer-logo"><img src="images/choose.png" alt="Choose" style="height: 75px;"></h1>
+       <h1 class="footer-logo"><img src="images/choose.png" alt="Choose"></h1>
       </div>
     </div>
  
@@ -328,15 +352,15 @@
       <div class="glass-card">
         <p class="card-label">Identitas Pemilih</p>
         <div class="pill-data" id="v-name">Nama Siswa</div>
-        <div style="display: flex; gap: 10px;">
+        <div class="grid-duo">
           <div class="pill-data" id="v-gender">Gender</div>
-          <div class="pill-data" id="v-kelas" style="width: 250px;">Kelas</div>
+          <div class="pill-data" id="v-kelas">Kelas</div>
         </div>
         <div class="pill-data" id="v-ttl">Semarang, 16 Mei 2009</div>
  
         <div class="check-container" onclick="toggleCb()">
           <div id="cb" class="circle-check"></div>
-          <p style="font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.4;">Saya memastikan bahwa data di atas benar dan merupakan identitas saya.</p>
+          <p style="font-size: clamp(0.6875rem, 1.2vw, 0.75rem); color: rgba(255,255,255,0.8); line-height: 1.4;">Saya memastikan bahwa data di atas benar dan merupakan identitas saya.</p>
         </div>
  
         <button id="btn-vote" class="btn-pill btn-white hidden" onclick="goVoting()" style="margin-bottom: 10px; display:none;">Mulai Voting →</button>
@@ -345,14 +369,13 @@
  
       <div class="footer">
         <p>Hasil Pilihan mu Aman dan Privat</p>
-        <h1 class="footer-logo"><img src="images/choose.png" alt="Choose" style="height: 75px;"></h1>
+        <h1 class="footer-logo"><img src="images/choose.png" alt="Choose"></h1>
       </div>
     </div>
  
     <!-- SCREEN 4: VOTING -->
-    <div id="s-voting" class="screen" style="overflow-y: auto; align-items: stretch;">
+    <div id="s-voting" class="screen">
       <div class="top-actions">
-
       </div>
       <div class="voting-head">
         <h2>Daftar Kandidat</h2>
@@ -364,23 +387,23 @@
     <!-- SCREEN 5: SUCCESS -->
     <div id="s-voted" class="screen" style="justify-content: center; text-align: center; position: relative;">
       <div class="confetti" id="confetti"></div>
-      <div style="background: #fff; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; animation: cardIn 0.5s cubic-bezier(.2,.8,.2,1);">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="4"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      <div style="background: #fff; width: clamp(60px, 12vw, 80px); height: clamp(60px, 12vw, 80px); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto clamp(15px, 4vh, 30px); animation: cardIn 0.5s cubic-bezier(.2,.8,.2,1);">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="4" style="width: 50%; height: 50%;"><polyline points="20 6 9 17 4 12"></polyline></svg>
       </div>
-      <h2 style="font-size: 36px; font-weight: 800; animation: fadeUp 0.5s ease 0.1s both;">Berhasil</h2>
-      <p style="color: rgba(255,255,255,0.6); margin-bottom: 40px; animation: fadeUp 0.5s ease 0.2s both;" id="voted-desc">Pilihan Anda telah tercatat secara anonim.</p>
-      <button class="btn-pill btn-white" onclick="restartApp()" style="max-width: 250px; animation: fadeUp 0.5s ease 0.3s both;">Selesai & Keluar</button>
+      <h2 style="font-size: clamp(1.75rem, 6vw, 2.25rem); font-weight: 800; animation: fadeUp 0.5s ease 0.1s both;">Berhasil</h2>
+      <p style="color: rgba(255,255,255,0.6); margin-bottom: clamp(20px, 5vh, 40px); font-size: var(--font-body); animation: fadeUp 0.5s ease 0.2s both;" id="voted-desc">Pilihan Anda telah tercatat secara anonim.</p>
+      <button class="btn-pill btn-white" onclick="restartApp()" style="width: min(90vw, 250px); margin: 0 auto; animation: fadeUp 0.5s ease 0.3s both;">Selesai & Keluar</button>
     </div>
   </div>
  
   <!-- MODAL -->
-  <div id="modal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px;">
+  <div id="modal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: clamp(12px, 3vw, 20px);">
     <div class="glass-card" style="text-align: center;">
-      <h3 style="font-size: 20px; margin-bottom: 15px;">Konfirmasi Pilihan</h3>
-      <p id="m-desc" style="font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 25px;"></p>
-      <div style="display: flex; gap: 10px;">
-        <button class="btn-pill btn-outline" onclick="closeModal()">Pilih Kembali</button>
+      <h3 style="font-size: clamp(1.125rem, 3vw, 1.25rem); margin-bottom: 15px;">Konfirmasi Pilihan</h3>
+      <p id="m-desc" style="font-size: var(--font-body); color: rgba(255,255,255,0.6); margin-bottom: 25px;"></p>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
         <button class="btn-pill btn-white" onclick="confirmVote()">Ya, saya yakin dengan pilihan saya</button>
+        <button class="btn-pill btn-outline" onclick="closeModal()">Pilih Kembali</button>
       </div>
     </div>
   </div>
@@ -429,7 +452,7 @@
       cb.classList.toggle('active', isChecked);
       btnVote.classList.toggle('hidden', !isChecked);
       // Inline style as a failsafe in case any cached/old CSS lingers
-      btnVote.style.display = isChecked ? 'block' : 'none';
+      btnVote.style.display = isChecked ? 'inline-flex' : 'none';
     }
  
     function restartApp() {
@@ -460,21 +483,23 @@
         <div class="c-card">
           <div class="c-img">
             <img src="${c.foto}" alt="${c.nama}">
-            <div style="position:absolute; bottom:20px; left:20px; z-index:2;">
-              <h3 style="font-size:24px; font-weight:800;">${c.nama}</h3>
-              <p style="font-size:12px; font-weight:400; opacity:0.6;">${c.kelas}</p>
+            <div style="position:absolute; bottom:15px; left:15px; right:15px; z-index:2;">
+              <h3 style="font-size:clamp(1.125rem, 3vw, 1.5rem); font-weight:800; line-height:1.1;">${c.nama}</h3>
+              <p style="font-size:clamp(0.6875rem, 1vw, 0.75rem); font-weight:400; opacity:0.6; margin-top:2px;">${c.kelas}</p>
             </div>
-            <div style="position:absolute; top:20px; left:20px; background:#fff; color:#000; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; z-index:2;">${c.no}</div>
+            <div style="position:absolute; top:15px; left:15px; background:#fff; color:#000; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; z-index:2;">${c.no}</div>
           </div>
           <div class="c-info">
-            <button class="btn-pill btn-outline" id="btn-grow-${c.id}" onclick="toggleGrowing(${c.id})" style="margin-bottom:10px;">Lihat Visi & Misi</button>
-            <div id="grow-${c.id}" class="growing">
-              <p style="font-size:11px; opacity:0.5; text-transform:uppercase; font-family:'Space Mono',monospace;">Visi</p>
-              <p style="font-size:14px; margin-bottom:15px;">"${c.visi}"</p>
-              <p style="font-size:11px; opacity:0.5; text-transform:uppercase; font-family:'Space Mono',monospace;">Misi</p>
-              <p style="font-size:14px;">${c.misi}</p>
+            <div>
+              <button class="btn-pill btn-outline" id="btn-grow-${c.id}" onclick="toggleGrowing(${c.id})" style="margin-bottom:10px;">Lihat Visi & Misi</button>
+              <div id="grow-${c.id}" class="growing">
+                <p style="font-size:11px; opacity:0.5; text-transform:uppercase; font-family:'Space Mono',monospace;">Visi</p>
+                <p style="font-size:14px; margin-bottom:15px;">"${c.visi}"</p>
+                <p style="font-size:11px; opacity:0.5; text-transform:uppercase; font-family:'Space Mono',monospace;">Misi</p>
+                <p style="font-size:14px;">${c.misi}</p>
+              </div>
             </div>
-            <button class="btn-pill btn-white" onclick="openModal(${c.id})">Pilih Kandidat ${c.no}</button>
+            <button class="btn-pill btn-white" onclick="openModal(${c.id})" style="margin-top:10px;">Pilih Kandidat ${c.no}</button>
           </div>
         </div>
       `).join('');
